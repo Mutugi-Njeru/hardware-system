@@ -1,0 +1,5 @@
+package org.acme.enums;
+
+public enum RequestTypes {
+    AUTHENTICATE_USER, CREATE_SUPER_ADMIN, CREATE_ADMIN, CREATE_CLIENT
+}
