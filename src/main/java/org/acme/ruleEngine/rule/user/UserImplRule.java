@@ -34,12 +34,6 @@ public class UserImplRule implements ServiceRule {
     public Object apply(Object request) {
         JsonObject requestBody = Util.convertObjectToJson(request);
         String requestType = requestBody.getString("requestType", "");
-        User user = new User(requestBody);
-        List<String> violations = validatorService.validateDTO(user);
-
-        if (!violations.isEmpty()) {
-            return Json.createObjectBuilder().add("message", String.valueOf(violations)).build();
-        }
 
         RequestTypes type;
         try {
@@ -50,13 +44,32 @@ public class UserImplRule implements ServiceRule {
 
         switch (type) {
             case CREATE_SUPER_ADMIN:
-                return Util.buildResponse(userService.createSuperAdmin(user));
             case CREATE_ADMIN:
-                return Util.buildResponse(userService.createAdmin(user));
             case CREATE_CLIENT:
-                return Util.buildResponse(userService.createClient(user));
+                User user = new User(requestBody);
+                List<String> violations = validatorService.validateDTO(user);
+
+                if (!violations.isEmpty()) {
+                    return Json.createObjectBuilder().add("message", String.valueOf(violations)).build();
+                }
+
+                return switch (type) {
+                    case CREATE_SUPER_ADMIN -> Util.buildResponse(userService.createSuperAdmin(user));
+                    case CREATE_ADMIN -> Util.buildResponse(userService.createAdmin(user));
+                    case CREATE_CLIENT -> Util.buildResponse(userService.createClient(user));
+                    default -> throw new IllegalStateException("Unexpected value: " + type);
+                };
+            // Example future case that just needs an integer from the request
+//            case UPDATE_USER_STATUS:
+//                int userId = requestBody.getInt("userId", -1);
+//                if (userId == -1) {
+//                    return Json.createObjectBuilder().add("message", "Missing userId").build();
+//                }
+//                return Util.buildResponse(userService.updateUserStatus(userId));
+
             default:
                 throw new IllegalArgumentException("Unhandled request type: " + requestType);
         }
     }
+
 }

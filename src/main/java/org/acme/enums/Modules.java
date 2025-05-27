@@ -1,5 +1,5 @@
 package org.acme.enums;
 
 public enum Modules {
-    AUTH, USER
+    AUTH, USER, ACCOUNT, PRODUCT
 }

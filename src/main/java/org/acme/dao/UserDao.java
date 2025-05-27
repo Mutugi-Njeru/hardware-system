@@ -100,5 +100,8 @@ public class UserDao {
         }
         return userDetailsId;
     }
+    //get all users in an account
+    //deactivate user
+    // delete user
 
 }

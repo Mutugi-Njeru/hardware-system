@@ -48,7 +48,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 List<String> roles = auth.roles();
 
                 // Superadmin-only path
-                if (path.equals("/user/create-superadmin")) {
+                if (path.equals("/user/create-superadmin") || path.equals("/account/create") || path.equals("/account/get")) {
                     if (roles.stream().noneMatch(role -> role.equalsIgnoreCase("super_admin"))) {
                         denyAccess(crc, "you do not have permission to perform this operation.");
                         return;
@@ -56,7 +56,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 }
 
                 // Superadmin and admin allowed path
-                if (path.equals("/user/create-admin")) {
+                if (path.equals("/user/create-admin") || path.equals("/product/create")) {
                     if (roles.stream().noneMatch(role ->
                             role.equalsIgnoreCase("super_admin") || role.equalsIgnoreCase("admin"))) {
                         denyAccess(crc, "only super_admin and admin roles are allowed for this operation.");
