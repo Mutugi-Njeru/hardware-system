@@ -2,6 +2,8 @@ package org.acme.ruleEngine.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.ws.rs.core.Response;
 import org.acme.dao.ProductDao;
 import org.acme.models.Product;
@@ -24,6 +26,14 @@ public class ProductService {
 
         } else
             return new ServiceResponse(Response.Status.CONFLICT.getStatusCode(), false, "product already exists with that name");
+    }
 
+    public ServiceResponse getAllProducts(JsonObject object) {
+        int accountId = object.getInt("accountId");
+        int pageSize = object.getInt("pageSize");
+        int pageNumber = object.getInt("pageNumber");
+        int offset = (pageNumber - 1) * pageSize;
+        JsonObject allProducts = productDao.getAllProducts(accountId, pageSize, offset);
+        return (!allProducts.isEmpty()) ? new ServiceResponse(Response.Status.OK.getStatusCode(), true, allProducts) : new ServiceResponse(Response.Status.NOT_FOUND.getStatusCode(), false, Json.createObjectBuilder().build());
     }
 }

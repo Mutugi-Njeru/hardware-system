@@ -65,35 +65,59 @@ public class ProductDao {
     }
 
     //get all products
-    public JsonObject getAllProducts(int accountId, int pageSize, int offset) {
-        String query = """
+    public JsonObject getAllProducts(int accountId, int itemsPerPage, int offset) {
+        String dataQuery = """
                 SELECT p.product_id, p.name, p.price_per_unit, u.unit, p.quantity_available, 
                        p.image_url_1, p.image_url_2, p.status
                 FROM products p
                 INNER JOIN units u ON u.unit_id = p.unit_id
                 WHERE p.account_id = ?
                 LIMIT ? OFFSET ?""";
-
-        var productsJson = Json.createObjectBuilder();
+        String countQuery = "SELECT COUNT(*) FROM products WHERE account_id = ?";
+        var responseJson = Json.createObjectBuilder();
         var products = Json.createArrayBuilder();
-
-        try (Connection connection = ads.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, accountId);
-            preparedStatement.setInt(2, pageSize);
-            preparedStatement.setInt(3, offset);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                var product = Json.createObjectBuilder().add("productId", resultSet.getInt(1)).add("name", resultSet.getString(2)).add("pricePerUnit", resultSet.getDouble(3)).add("unitOfMeasurement", resultSet.getString(4)).add("quantityAvailable", resultSet.getInt(5)).add("imageUrl1", resultSet.getString(6)).add("imageUrl2", resultSet.getString(7)).add("status", resultSet.getBoolean(8));
-                products.add(product);
+        int totalItems = 0;
+        try (Connection connection = ads.getConnection()) {
+            // Step 1: Count total items
+            try (PreparedStatement countStmt = connection.prepareStatement(countQuery)) {
+                countStmt.setInt(1, accountId);
+                ResultSet countResult = countStmt.executeQuery();
+                if (countResult.next()) {
+                    totalItems = countResult.getInt(1);
+                }
             }
-
+            // Step 2: Fetch paginated data
+            try (PreparedStatement dataStmt = connection.prepareStatement(dataQuery)) {
+                dataStmt.setInt(1, accountId);
+                dataStmt.setInt(2, itemsPerPage);
+                dataStmt.setInt(3, offset);
+                ResultSet resultSet = dataStmt.executeQuery();
+                while (resultSet.next()) {
+                    var product = Json.createObjectBuilder()
+                            .add("productId", resultSet.getInt(1))
+                            .add("name", resultSet.getString(2))
+                            .add("pricePerUnit", resultSet.getDouble(3))
+                            .add("unitOfMeasurement", resultSet.getString(4))
+                            .add("quantityAvailable", resultSet.getInt(5))
+                            .add("imageUrl1", resultSet.getString(6))
+                            .add("imageUrl2", resultSet.getString(7))
+                            .add("status", resultSet.getBoolean(8));
+                    products.add(product);
+                }
+            }
+            int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+            // Step 3: Return full response
+            responseJson
+                    .add("totalItems", totalItems)
+                    .add("totalPages", totalPages)
+                    .add("itemsPerPage", itemsPerPage)
+                    .add("offset", offset)
+                    .add("products", products);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        return productsJson.add("products", products).build();
+        return responseJson.build();
     }
+
 
 }

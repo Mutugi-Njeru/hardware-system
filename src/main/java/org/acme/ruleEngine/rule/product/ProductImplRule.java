@@ -45,6 +45,8 @@ public class ProductImplRule implements ServiceRule {
                     return Json.createObjectBuilder().add("message", String.valueOf(violations)).build();
                 }
                 return Util.buildResponse(productService.createProduct(product));
+            case GET_ALL_PRODUCTS:
+                return Util.buildResponse(productService.getAllProducts(requestBody));
             default:
                 throw new IllegalArgumentException("Unhandled request type: " + requestType);
         }

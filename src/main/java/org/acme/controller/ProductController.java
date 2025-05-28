@@ -3,9 +3,7 @@ package org.acme.controller;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.enums.Modules;
@@ -31,4 +29,14 @@ public class ProductController {
         JsonObject requestJson = Json.createObjectBuilder(Util.convertInputStreamToJson(inputStream)).add("requestType", RequestTypes.CREATE_PRODUCT.name()).build();
         return engine.routeRequest(requestJson, Modules.PRODUCT.name());
     }
+
+    @GET
+    @Path("get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProducts(@QueryParam("accountId") int accountId, @QueryParam("pageSize") int pageSize, @QueryParam("pageNumber") int pageNumber) {
+        JsonObject requestJson = Json.createObjectBuilder().add("accountId", accountId).add("pageSize", pageSize).add("pageNumber", pageNumber).add("requestType", RequestTypes.GET_ALL_PRODUCTS.name()).build();
+        return engine.routeRequest(requestJson, Modules.PRODUCT.name());
+
+    }
+
 }
