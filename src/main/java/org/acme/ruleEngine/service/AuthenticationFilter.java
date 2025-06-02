@@ -63,6 +63,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                         return;
                     }
                 }
+                if (path.equals("/cart/add-product")) {
+                    if (roles.stream().noneMatch(role ->
+                            role.equalsIgnoreCase("client"))) {
+                        denyAccess(crc, "only clients can add items to cart.");
+                        return;
+                    }
+                }
 
                 // Token valid and role permitted
                 return;

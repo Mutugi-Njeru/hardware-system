@@ -113,11 +113,15 @@ public class ProductDao {
                     .add("itemsPerPage", itemsPerPage)
                     .add("offset", offset)
                     .add("products", products);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            logger.error(Constants.ERROR_LOG_TEMPLATE, Constants.ERROR, ex.getClass().getSimpleName(), ex.getMessage());
         }
         return responseJson.build();
     }
+    //update product
+//    public boolean updateProductDetails (){
+//        String query=""
+//    }
 
 
 }
