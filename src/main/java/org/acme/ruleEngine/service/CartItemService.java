@@ -2,6 +2,7 @@ package org.acme.ruleEngine.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.json.JsonObject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import org.acme.dao.CartItemDao;
@@ -25,6 +26,7 @@ public class CartItemService {
 
         Double productPrice = cartItemDao.getProductPrice(cartItem.productId());
 
+
         int cartItemId = cartItemDao.addItemToCart(cartItem, cartId, productPrice);
 
         if (cartItemId > 0) {
@@ -32,6 +34,12 @@ public class CartItemService {
         } else {
             return new ServiceResponse(Response.Status.EXPECTATION_FAILED.getStatusCode(), false, "Cannot add item to cart");
         }
+    }
+    public ServiceResponse getCartItems(int userId){
+        JsonObject cartItems = cartItemDao.getCartItems(userId);
+        return (!cartItems.isEmpty())
+                ? new ServiceResponse(Response.Status.OK.getStatusCode(), true, cartItems)
+                : new ServiceResponse(Response.Status.EXPECTATION_FAILED.getStatusCode(), false, "No items found on cart. Please add some");
     }
 
 }

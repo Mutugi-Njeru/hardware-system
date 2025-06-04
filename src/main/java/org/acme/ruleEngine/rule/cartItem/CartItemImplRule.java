@@ -45,6 +45,8 @@ public class CartItemImplRule implements ServiceRule {
                     return Json.createObjectBuilder().add("message", String.valueOf(violations)).build();
                 }
                 return Util.buildResponse(cartItemService.addItemToCart(cartItem));
+            case GET_CART_ITEMS:
+                return Util.buildResponse(cartItemService.getCartItems(requestBody.getInt("userId")));
             default:
                 throw new IllegalArgumentException("Unhandled request type: " + requestType);
         }

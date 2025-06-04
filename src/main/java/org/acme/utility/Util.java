@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Util {
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int CODE_LENGTH = 8;
+    private static final SecureRandom random = new SecureRandom();
 
     public static JsonObject buildResponse (ServiceResponse responder) {
         Object message = responder.message();
@@ -67,5 +72,13 @@ public class Util {
             builder.add(role);
         }
         return builder.build();
+    }
+    public static String generateCode() {
+        StringBuilder code = new StringBuilder(CODE_LENGTH);
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            code.append(CHARACTERS.charAt(index));
+        }
+        return code.toString();
     }
 }

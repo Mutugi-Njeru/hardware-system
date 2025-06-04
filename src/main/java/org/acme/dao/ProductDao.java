@@ -64,7 +64,6 @@ public class ProductDao {
         return productId;
     }
 
-    //get all products
     public JsonObject getAllProducts(int accountId, int itemsPerPage, int offset) {
         String dataQuery = """
                 SELECT p.product_id, p.name, p.price_per_unit, u.unit, p.quantity_available, 
@@ -78,7 +77,7 @@ public class ProductDao {
         var products = Json.createArrayBuilder();
         int totalItems = 0;
         try (Connection connection = ads.getConnection()) {
-            // Step 1: Count total items
+
             try (PreparedStatement countStmt = connection.prepareStatement(countQuery)) {
                 countStmt.setInt(1, accountId);
                 ResultSet countResult = countStmt.executeQuery();
@@ -86,7 +85,7 @@ public class ProductDao {
                     totalItems = countResult.getInt(1);
                 }
             }
-            // Step 2: Fetch paginated data
+
             try (PreparedStatement dataStmt = connection.prepareStatement(dataQuery)) {
                 dataStmt.setInt(1, accountId);
                 dataStmt.setInt(2, itemsPerPage);
@@ -118,10 +117,8 @@ public class ProductDao {
         }
         return responseJson.build();
     }
-    //update product
-//    public boolean updateProductDetails (){
-//        String query=""
-//    }
+
+
 
 
 }
