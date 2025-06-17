@@ -14,10 +14,10 @@ FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
 # Copy the built JAR from the previous stage
-COPY --from=build /app/target/hardware-system-1.0.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/quarkus-app /app
 
 # Expose the port your Quarkus app runs on (default is 8080)
 EXPOSE 8080
 
-# Start the app
-CMD ["java", "-jar", "app.jar"]
+# Run using the Quarkus launcher
+CMD ["java", "-jar", "quarkus-run.jar"]
